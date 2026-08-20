@@ -380,3 +380,6 @@ export const auditLogs = pgTable("audit_logs", {
   after: jsonb("after").$type<Record<string, unknown>>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Customer-facing studio tables (see ./studio.ts).
+export * from "./studio";

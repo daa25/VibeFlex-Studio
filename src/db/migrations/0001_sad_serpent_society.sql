@@ -1,0 +1,61 @@
+CREATE TABLE IF NOT EXISTS "studio_artworks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"asset_id" text NOT NULL,
+	"storage_provider" text NOT NULL,
+	"storage_path" text NOT NULL,
+	"url" text NOT NULL,
+	"file_name" text,
+	"mime_type" text NOT NULL,
+	"width" integer NOT NULL,
+	"height" integer NOT NULL,
+	"bytes" integer NOT NULL,
+	"checksum" text NOT NULL,
+	"has_transparency" boolean DEFAULT false NOT NULL,
+	"ephemeral" boolean DEFAULT false NOT NULL,
+	"analysis" jsonb DEFAULT '{}'::jsonb,
+	"ai_analysis" jsonb,
+	"ai_status" text DEFAULT 'not_configured' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "studio_artworks_asset_id_unique" UNIQUE("asset_id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "studio_designs" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"reference" text NOT NULL,
+	"artwork_asset_id" text NOT NULL,
+	"product_id" text NOT NULL,
+	"color_id" text NOT NULL,
+	"size_id" text NOT NULL,
+	"quantity" integer DEFAULT 1 NOT NULL,
+	"config" jsonb NOT NULL,
+	"print_geometry" jsonb DEFAULT '[]'::jsonb,
+	"unit_cost" numeric(10, 2),
+	"unit_price" numeric(10, 2),
+	"margin_pct" numeric(5, 2),
+	"pricing" jsonb DEFAULT '{}'::jsonb,
+	"status" text DEFAULT 'CONFIGURED' NOT NULL,
+	"provider" text,
+	"provider_refs" jsonb DEFAULT '{}'::jsonb,
+	"shopify_product_id" text,
+	"shopify_variant_ids" jsonb DEFAULT '[]'::jsonb,
+	"shopify_admin_url" text,
+	"checkout_url" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "studio_designs_reference_unique" UNIQUE("reference")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "studio_orders" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"shopify_order_id" text NOT NULL,
+	"shopify_line_item_id" text NOT NULL,
+	"design_reference" text,
+	"artwork_url" text,
+	"provider" text,
+	"provider_order_id" text,
+	"status" text DEFAULT 'RECEIVED' NOT NULL,
+	"payload" jsonb DEFAULT '{}'::jsonb,
+	"last_error" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
