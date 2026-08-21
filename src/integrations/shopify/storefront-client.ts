@@ -167,17 +167,45 @@ export async function getProductByHandle(
 // Cart is created client-side against the Storefront API directly (it's a
 // public, unauthenticated mutation), so no admin credentials are ever
 // exposed to the browser.
-export async function createCart(merchandiseId: string, quantity = 1) {
+export type CartAttribute = { key: string; value: string };
+
+export async function createCart(
+  merchandiseId: string,
+  quantity = 1,
+  options: { lineAttributes?: CartAttribute[]; cartAttributes?: CartAttribute[] } = {}
+) {
+  // Line-item attributes are how a customization travels with the order: they
+  // are visible in Shopify Admin, included in the order payload, and readable
+  // by fulfillment. Cart-level attributes carry the studio reference.
   const data = await storefrontRequest<{
-    cartCreate: { cart: { id: string; checkoutUrl: string } };
+    cartCreate: {
+      cart: { id: string; checkoutUrl: string } | null;
+      userErrors: { field: string[] | null; message: string }[];
+    };
   }>(
-    `mutation CartCreate($lines: [CartLineInput!]!) {
-      cartCreate(input: { lines: $lines }) {
+    `mutation CartCreate($lines: [CartLineInput!]!, $attributes: [AttributeInput!]) {
+      cartCreate(input: { lines: $lines, attributes: $attributes }) {
         cart { id checkoutUrl }
+        userErrors { field message }
       }
     }`,
-    { lines: [{ merchandiseId, quantity }] }
+    {
+      lines: [
+        {
+          merchandiseId,
+          quantity,
+          ...(options.lineAttributes?.length ? { attributes: options.lineAttributes } : {}),
+        },
+      ],
+      attributes: options.cartAttributes ?? [],
+    }
   );
+
+  const errors = data.cartCreate.userErrors;
+  if (errors?.length) {
+    throw new Error(`Shopify cartCreate failed: ${errors.map((e) => e.message).join("; ")}`);
+  }
+  if (!data.cartCreate.cart) throw new Error("Shopify cartCreate returned no cart.");
 
   return data.cartCreate.cart;
 }
