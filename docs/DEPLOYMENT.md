@@ -64,3 +64,35 @@ it, move it yourself:
 ```bash
 mkdir -p .github/workflows && git mv docs/ci-workflow.yml .github/workflows/ci.yml
 ```
+
+## Shopify Admin authentication — two supported models
+
+The adapter does not care which model the store uses, and it never validates a
+token's prefix (`shpat_` is a convention, not a rule).
+
+**Model A — direct Admin API access token**
+
+```
+SHOPIFY_SHOP_DOMAIN=hbipmy-3g.myshopify.com
+SHOPIFY_ADMIN_API_ACCESS_TOKEN=<token>
+```
+
+**Model B — OAuth client credentials (Shopify-managed installation)**
+
+```
+SHOPIFY_SHOP_DOMAIN=hbipmy-3g.myshopify.com
+SHOPIFY_CLIENT_ID=<client id>
+SHOPIFY_CLIENT_SECRET=<client secret>
+```
+
+With Model B the server exchanges the credentials at
+`POST https://{shop}/admin/oauth/access_token` (`grant_type=client_credentials`)
+and caches the resulting short-lived token in memory until a minute before it
+expires. A 401/403 clears the cache so the next call re-exchanges.
+
+If both are present the static token wins. Either way the value stays
+server-side; none of these names may ever be prefixed `NEXT_PUBLIC_`.
+
+Required Admin API scopes remain `read_products`, `write_products`, and
+`read_orders` for downstream order verification. The studio's write boundary is
+unchanged: it creates DRAFT products and nothing else.
