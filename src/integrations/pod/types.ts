@@ -37,11 +37,22 @@ export type ArtworkValidationResult = {
   minRequiredDpi?: number;
 };
 
+export type PrintPosition = {
+  area_width: number;
+  area_height: number;
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+};
+
 export type MockupJobInput = {
   catalogProductExternalId: string;
   variantExternalIds: string[];
   printAreaId: string;
   artworkFileUrl: string;
+  /** Required by Printful. Computed from the provider printfile, not guessed. */
+  position?: PrintPosition;
 };
 
 export type MockupJob = {
