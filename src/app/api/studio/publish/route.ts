@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getProviderVariantMap } from "@/integrations/pod/catalog-service";
 import { adminConfigMissing, ShopifyNotConfiguredError } from "@/integrations/shopify/admin-client";
 import { publishDraftProduct } from "@/integrations/shopify/publish-draft";
+import { findExistingDraftByReference, verifyDraftProduct } from "@/integrations/shopify/verify-draft";
+import { generateMockup } from "@/lib/mockup-service";
 import { markDesignPublished, newDesignReference, saveDesign } from "@/lib/repository";
 import { prepareDesign, withIdempotency } from "@/lib/studio-service";
+import { runVisualQa } from "@/lib/visual-qa";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -66,6 +69,59 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Durable idempotency: the in-memory cache only protects a warm process, so
+    // ask Shopify whether this reference already has a draft before creating one.
+    if (body.reference) {
+      const existing = await findExistingDraftByReference(reference).catch(() => null);
+      if (existing) {
+        const verification = await verifyDraftProduct(existing);
+        return {
+          status: 200,
+          body: {
+            reference,
+            shopify: { productId: existing, status: verification.snapshot.status },
+            verification,
+            deduplicated: true,
+            note: "A draft already exists for this studio reference; no duplicate was created.",
+          },
+        };
+      }
+    }
+
+    // STAGE: production mockup. The uploaded artwork is the print file — it is
+    // never the product photo. If no mockup can be rendered we publish without
+    // media rather than shipping the print file as the hero image.
+    const mockup = await generateMockup({
+      design,
+      artworkUrl: design.config.artwork.url,
+      variantExternalIds: Object.values(variantMap.map),
+    });
+
+    // STAGE: visual QA. Runs before anything is attached to Shopify.
+    const qa = mockup.heroUrl
+      ? await runVisualQa({
+          imageUrl: mockup.heroUrl,
+          provenance: "provider_mockup",
+          expected: {
+            garmentType: design.product.name,
+            garmentColor: design.color.label,
+          },
+        })
+      : {
+          verdict: "PENDING" as const,
+          findings: [
+            {
+              code: "NO_MOCKUP",
+              severity: "blocker" as const,
+              detail: mockup.message ?? "No mockup was produced.",
+            },
+          ],
+          checkedUrl: "",
+          aiStatus: "skipped" as const,
+        };
+
+    const heroForShopify = mockup.heroUrl && qa.verdict !== "REJECTED" ? mockup.heroUrl : undefined;
+
     try {
       const published = await publishDraftProduct({
         design,
@@ -73,9 +129,7 @@ export async function POST(req: NextRequest) {
         reference,
         provider,
         providerRefs,
-        imageUrl: design.config.artwork.url.startsWith("https://")
-          ? design.config.artwork.url
-          : undefined,
+        imageUrl: heroForShopify,
       });
 
       const persistence = await markDesignPublished({
@@ -85,15 +139,25 @@ export async function POST(req: NextRequest) {
         shopifyAdminUrl: published.adminUrl,
       });
 
+      // STAGE: read-back. A mutation response is not proof. Re-query Shopify and
+      // assert the fields we care about before calling this a success.
+      const verification = await verifyDraftProduct(published.productId);
+
       return {
         status: 200,
         body: {
           reference,
           shopify: published,
+          mockup,
+          qa,
+          verification,
           pricing,
           providerCatalogMode: variantMap.mode,
           providerWarning: variantMap.warning,
           persistence,
+          // The pipeline only succeeded if Shopify agrees AND QA did not reject.
+          pipelineOk: verification.verified && qa.verdict !== "REJECTED",
+          blocker: qa.verdict === "REJECTED" ? "ASSET REQUIRED — STUDIO" : undefined,
         },
       };
     } catch (err) {
