@@ -383,3 +383,4 @@ export const auditLogs = pgTable("audit_logs", {
 
 // Customer-facing studio tables (see ./studio.ts).
 export * from "./studio";
+export * from "./jobs";
