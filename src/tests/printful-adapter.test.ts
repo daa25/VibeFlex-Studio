@@ -7,7 +7,8 @@ import {
 
 /** Minimal fetch stub: maps a URL substring to a JSON response. */
 function stubFetch(routes: Record<string, { ok?: boolean; status?: number; body: unknown }>) {
-  const spy = vi.fn(async (url: string | URL) => {
+  const spy = vi.fn(async (url: string | URL, init?: RequestInit) => {
+    void init;
     const href = String(url);
     const hit = Object.entries(routes).find(([fragment]) => href.includes(fragment));
     if (!hit) throw new Error(`Unstubbed request: ${href}`);
@@ -140,7 +141,7 @@ describe("Printful mockup task", () => {
     expect(job.providerJobId).toBe("gt-1");
     const [url, init] = fetchSpy.mock.calls[0]!;
     expect(String(url)).toContain("/mockup-generator/create-task/71");
-    const sent = JSON.parse(String((init as RequestInit).body));
+    const sent = JSON.parse(String(init?.body));
     expect(sent.files[0].position).toBeDefined();
     expect(sent.format).toBe("jpg");
   });
