@@ -5,6 +5,9 @@
 // products from the studio and for reading orders during fulfillment.
 
 import { env } from "@/lib/env";
+import { adminConfigMissing, getAdminAccessToken, resetAdminTokenCache } from "./token";
+
+export { adminConfigMissing, adminAuthMode } from "./token";
 
 export class ShopifyNotConfiguredError extends Error {
   constructor(public readonly missing: string[]) {
@@ -13,13 +16,6 @@ export class ShopifyNotConfiguredError extends Error {
     );
     this.name = "ShopifyNotConfiguredError";
   }
-}
-
-export function adminConfigMissing(): string[] {
-  const missing: string[] = [];
-  if (!env.shopDomain()) missing.push("SHOPIFY_SHOP_DOMAIN");
-  if (!env.shopifyAdminToken()) missing.push("SHOPIFY_ADMIN_API_ACCESS_TOKEN");
-  return missing;
 }
 
 export type UserError = { field?: string[] | null; message: string };
@@ -37,7 +33,7 @@ export async function adminGraphql<T>(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Access-Token": env.shopifyAdminToken()!,
+        "X-Shopify-Access-Token": await getAdminAccessToken(),
       },
       body: JSON.stringify({ query, variables }),
       cache: "no-store",
@@ -45,8 +41,11 @@ export async function adminGraphql<T>(
   );
 
   if (res.status === 401 || res.status === 403) {
+    // A cached client-credentials token may have been revoked early; drop it so
+    // the next call re-exchanges instead of replaying a dead token.
+    resetAdminTokenCache();
     throw new Error(
-      "Shopify rejected the Admin API token (401/403). Confirm the app is installed on the store and the token has write_products and read_orders scopes."
+      "Shopify rejected the Admin API token (401/403). Confirm the app is installed on the store and its Admin API scopes include write_products, read_products and read_orders."
     );
   }
   if (!res.ok) {

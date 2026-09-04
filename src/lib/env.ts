@@ -19,6 +19,9 @@ export const env = {
 
   shopDomain: () => read("SHOPIFY_SHOP_DOMAIN"),
   shopifyAdminToken: () => read("SHOPIFY_ADMIN_API_ACCESS_TOKEN"),
+  // OAuth / Shopify-managed installation alternative to a static admin token.
+  shopifyClientId: () => read("SHOPIFY_CLIENT_ID"),
+  shopifyClientSecret: () => read("SHOPIFY_CLIENT_SECRET"),
   shopifyAdminApiVersion: () => read("SHOPIFY_API_VERSION") ?? "2025-01",
   shopifyStorefrontToken: () => read("SHOPIFY_STOREFRONT_ACCESS_TOKEN"),
   shopifyStorefrontApiVersion: () => read("SHOPIFY_STOREFRONT_API_VERSION") ?? "2025-01",
@@ -70,9 +73,14 @@ export function serviceStatuses(): ServiceStatus[] {
     ["SHOPIFY_SHOP_DOMAIN", env.shopDomain()],
     ["SHOPIFY_STOREFRONT_ACCESS_TOKEN", env.shopifyStorefrontToken()],
   ]);
+  const hasAdminCredential =
+    env.shopifyAdminToken() || (env.shopifyClientId() && env.shopifyClientSecret());
   const admin = miss([
     ["SHOPIFY_SHOP_DOMAIN", env.shopDomain()],
-    ["SHOPIFY_ADMIN_API_ACCESS_TOKEN", env.shopifyAdminToken()],
+    [
+      "SHOPIFY_ADMIN_API_ACCESS_TOKEN (or SHOPIFY_CLIENT_ID + SHOPIFY_CLIENT_SECRET)",
+      hasAdminCredential,
+    ],
   ]);
   const webhook = miss([["SHOPIFY_WEBHOOK_SECRET", env.shopifyWebhookSecret()]]);
 
