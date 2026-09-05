@@ -101,13 +101,30 @@ export function buildFulfillmentPlan(
         "Artwork URL is not a public https URL, so the printer cannot download it (configure Supabase Storage)."
       );
 
+    // Without a provider variant id there is nothing for the supplier to
+    // manufacture. This has to be a blocker, not a missing field: the payload
+    // builder emits `variant_id: undefined`, which serialises away entirely, so
+    // a line could otherwise look submittable and then fail at the printer —
+    // after the customer has already paid.
+    const providerVariantId = prop(line, "_provider_variant_id");
+    if (!providerVariantId) {
+      blockers.push(
+        "No supplier variant id on the order line, so the printer has nothing to produce. " +
+          "The Shopify variant is not mapped to a fulfillment variant."
+      );
+    } else if (!/^\d+$/.test(providerVariantId)) {
+      blockers.push(
+        `Supplier variant id "${providerVariantId}" is not numeric, so it cannot be a valid Printful variant.`
+      );
+    }
+
     items.push({
       lineItemId: String(line.id),
       quantity: line.quantity,
       studioReference: reference,
       artworkUrl,
       provider: prop(line, "_pod_provider") ?? defaultProvider,
-      providerVariantId: prop(line, "_provider_variant_id"),
+      providerVariantId,
       geometry,
       blockers,
     });
