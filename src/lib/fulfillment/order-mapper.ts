@@ -12,6 +12,8 @@ export type ShopifyOrderLine = {
   quantity: number;
   sku?: string | null;
   variant_id?: number | string | null;
+  /** Per-unit price the customer actually paid. Used as retail for margin routing. */
+  price?: string | number | null;
   properties?: ShopifyLineItemProperty[] | null;
 };
 
@@ -48,6 +50,10 @@ export type FulfillmentItem = {
   artworkUrl?: string;
   provider: string;
   providerVariantId?: string;
+  /** Decoration method for this line (lowercased). Drives production routing. */
+  technique: string;
+  /** Per-unit retail the customer paid, for margin routing. */
+  unitPrice?: number;
   geometry: PrintGeometryRecord[];
   /** Reasons this line cannot be auto-submitted to production. */
   blockers: string[];
@@ -101,13 +107,38 @@ export function buildFulfillmentPlan(
         "Artwork URL is not a public https URL, so the printer cannot download it (configure Supabase Storage)."
       );
 
+    // Without a provider variant id there is nothing for the supplier to
+    // manufacture. This has to be a blocker, not a missing field: the payload
+    // builder emits `variant_id: undefined`, which serialises away entirely, so
+    // a line could otherwise look submittable and then fail at the printer —
+    // after the customer has already paid.
+    const providerVariantId = prop(line, "_provider_variant_id");
+    if (!providerVariantId) {
+      blockers.push(
+        "No supplier variant id on the order line, so the printer has nothing to produce. " +
+          "The Shopify variant is not mapped to a fulfillment variant."
+      );
+    } else if (!/^\d+$/.test(providerVariantId)) {
+      blockers.push(
+        `Supplier variant id "${providerVariantId}" is not numeric, so it cannot be a valid Printful variant.`
+      );
+    }
+
+    const rawPrice = line.price;
+    const unitPrice =
+      rawPrice === undefined || rawPrice === null || Number.isNaN(Number(rawPrice))
+        ? undefined
+        : Number(rawPrice);
+
     items.push({
       lineItemId: String(line.id),
       quantity: line.quantity,
       studioReference: reference,
       artworkUrl,
       provider: prop(line, "_pod_provider") ?? defaultProvider,
-      providerVariantId: prop(line, "_provider_variant_id"),
+      providerVariantId,
+      technique: (prop(line, "_technique") ?? "dtg").toLowerCase(),
+      unitPrice,
       geometry,
       blockers,
     });

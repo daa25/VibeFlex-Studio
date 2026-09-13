@@ -25,3 +25,16 @@ export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
     return Reflect.get(getDb() as object, prop, receiver);
   },
 });
+
+/**
+ * Non-throwing accessor for optional-database code paths.
+ *
+ * Returns null when DATABASE_URL is absent so callers can report a clear
+ * "not configured" state instead of crashing. Use this in anything that must
+ * keep working without a database (the studio pipeline itself); use `db` where
+ * a database is genuinely required.
+ */
+export function tryGetDb(): PostgresJsDatabase<typeof schema> | null {
+  if (!process.env.DATABASE_URL) return null;
+  return getDb();
+}

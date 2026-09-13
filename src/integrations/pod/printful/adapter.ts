@@ -16,6 +16,32 @@ import type {
 
 const PRINTFUL_API_BASE = "https://api.printful.com";
 
+/**
+ * Printful store platforms whose sync-product API can be used to CREATE a
+ * fulfillment product. A Shopify/Etsy/etc. store is driven by Printful's own
+ * integration instead, and rejects /store/products with HTTP 400.
+ */
+export const SYNC_API_PLATFORMS = ["native", "manual", "api"];
+
+/** Raised when a store's platform cannot support API-created sync products. */
+export class PrintfulPlatformError extends Error {
+  readonly code = "PRINTFUL_PLATFORM_UNSUPPORTED";
+  constructor(
+    readonly storeId: string,
+    readonly platform: string
+  ) {
+    super(
+      `Printful store ${storeId} is a "${platform}" platform store, so a fulfillment ` +
+        `product cannot be created through the API. Printful owns product sync for ` +
+        `this store type: create the product in Printful and let it push to Shopify, ` +
+        `or match the existing Shopify product in Printful's Shopify app. Writing to a ` +
+        `different store on the account would produce a fulfillment path that does not ` +
+        `serve this storefront.`
+    );
+    this.name = "PrintfulPlatformError";
+  }
+}
+
 export const printfulCapabilities: ProviderCapabilities = {
   catalog: true,
   mockups: true,
@@ -49,6 +75,23 @@ export class PrintfulAdapter implements PodProviderAdapter {
     }
 
     return res.json() as Promise<T>;
+  }
+
+  private platformCache: string | null = null;
+
+  /** The configured store's platform, cached. Null when it cannot be determined. */
+  async getStorePlatform(): Promise<string | null> {
+    if (this.platformCache) return this.platformCache;
+    try {
+      const data = await this.request<{ result?: Array<{ id: number; type: string }> }>("/stores");
+      const store = (data.result ?? []).find((s) => String(s.id) === String(this.storeId));
+      this.platformCache = store?.type ?? null;
+      return this.platformCache;
+    } catch {
+      // A lookup failure must not silently unlock creation; the caller treats
+      // null as "unknown" and the create path still surfaces Printful's error.
+      return null;
+    }
   }
 
   async getCatalog(): Promise<PodProduct[]> {
@@ -206,6 +249,22 @@ export class PrintfulAdapter implements PodProviderAdapter {
   async createFulfillmentProduct(
     input: FulfillmentProductInput
   ): Promise<FulfillmentProduct> {
+    // Verified against the live account: /store/products returns HTTP 400 for a
+    // Shopify-platform store ("This API endpoint applies only to Printful
+    // stores based on the Manual Order / API platform"). Printful owns product
+    // sync for those stores, so a fulfillment product has to be created on the
+    // Printful side and pushed into Shopify.
+    //
+    // We refuse loudly rather than letting the 400 surface as a generic error,
+    // and we never fall back to another store on the account: writing to a
+    // different store would create a fulfillment path that does not serve the
+    // storefront while reporting success. A false "fulfillment verified" is
+    // worse than no fulfillment at all, because it unlocks publication.
+    const platform = await this.getStorePlatform();
+    if (platform && !SYNC_API_PLATFORMS.includes(platform)) {
+      throw new PrintfulPlatformError(this.storeId, platform);
+    }
+
     const data = await this.request<{ result: { id: number; sync_variants: any[] } }>(
       "/store/products",
       {
