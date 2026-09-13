@@ -12,6 +12,8 @@ export type ShopifyOrderLine = {
   quantity: number;
   sku?: string | null;
   variant_id?: number | string | null;
+  /** Per-unit price the customer actually paid. Used as retail for margin routing. */
+  price?: string | number | null;
   properties?: ShopifyLineItemProperty[] | null;
 };
 
@@ -48,6 +50,10 @@ export type FulfillmentItem = {
   artworkUrl?: string;
   provider: string;
   providerVariantId?: string;
+  /** Decoration method for this line (lowercased). Drives production routing. */
+  technique: string;
+  /** Per-unit retail the customer paid, for margin routing. */
+  unitPrice?: number;
   geometry: PrintGeometryRecord[];
   /** Reasons this line cannot be auto-submitted to production. */
   blockers: string[];
@@ -118,6 +124,12 @@ export function buildFulfillmentPlan(
       );
     }
 
+    const rawPrice = line.price;
+    const unitPrice =
+      rawPrice === undefined || rawPrice === null || Number.isNaN(Number(rawPrice))
+        ? undefined
+        : Number(rawPrice);
+
     items.push({
       lineItemId: String(line.id),
       quantity: line.quantity,
@@ -125,6 +137,8 @@ export function buildFulfillmentPlan(
       artworkUrl,
       provider: prop(line, "_pod_provider") ?? defaultProvider,
       providerVariantId,
+      technique: (prop(line, "_technique") ?? "dtg").toLowerCase(),
+      unitPrice,
       geometry,
       blockers,
     });

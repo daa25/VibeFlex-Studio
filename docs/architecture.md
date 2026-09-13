@@ -69,6 +69,28 @@ Two invariants the router never breaks:
 
 No paid order is ever automatically submitted to Printful or any external provider.
 
+## Order flow: a paid order becomes a routed production job
+
+The Shopify `orders/create` webhook (`app/api/webhooks/shopify/orders-create/route.ts`)
+is the live entry point. On a signature-verified order it now:
+
+1. `buildFulfillmentPlan()` — maps the paid order's line items (artwork, geometry,
+   supplier variant, technique, and the price the buyer paid) into a `FulfillmentPlan`.
+2. `planProduction()` (`lib/fulfillment/production-planner.ts`) — converts the plan into a
+   provider-neutral `ProductionOrderInput` and routes it via `routeProduction()`.
+3. The routing decision (chosen provider, kind, `requiresApproval`, reason) is persisted
+   with each order line and returned in the webhook response.
+
+Providers come from `getProductionProviders()`
+(`lib/fulfillment/production-runtime.ts`), which **always registers the in-house line** and
+adds Printful only when a live client is supplied. So a real order routes to production even
+with no external vendor configured.
+
+This path **plans and routes only — it never submits.** In-house work queues on the local
+provider; an external route is returned with `requiresApproval = true` and nothing is sent to
+a paid vendor without explicit owner authorization (`FULFILLMENT_AUTO_SUBMIT` stays the
+separate submission gate).
+
 ## Relationship to existing modules (preserved, not replaced)
 
 - `integrations/pod/types.ts` — catalog / mockup adapter contracts. Still used for the
@@ -90,3 +112,6 @@ No paid order is ever automatically submitted to Printful or any external provid
 - `tests/production-router.test.ts` — local-first routing; external fallback with approval;
   capacity and margin gating; produces with only the local provider registered; external
   never auto-submits.
+- `tests/production-planner.test.ts` — a paid Shopify order maps → routes to the in-house
+  line; carries retail from the price paid; an order with blockers is not routed; produces
+  with no external provider registered.
