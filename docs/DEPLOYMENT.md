@@ -96,3 +96,7 @@ server-side; none of these names may ever be prefixed `NEXT_PUBLIC_`.
 Required Admin API scopes remain `read_products`, `write_products`, and
 `read_orders` for downstream order verification. The studio's write boundary is
 unchanged: it creates DRAFT products and nothing else.
+
+## Hardening gate
+
+`/dashboard` and `/api/studio/publish` return 503 until STUDIO_ADMIN_PASSWORD is configured, in every environment. Missing credentials never disable authentication. A failed existing-draft lookup stops creation; visual QA must be PASS before pipelineOk can be true. CI now runs from `.github/workflows/ci.yml` with no secrets.
