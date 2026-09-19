@@ -72,7 +72,12 @@ export async function POST(req: NextRequest) {
     // Durable idempotency: the in-memory cache only protects a warm process, so
     // ask Shopify whether this reference already has a draft before creating one.
     if (body.reference) {
-      const existing = await findExistingDraftByReference(reference).catch(() => null);
+      let existing: string | null;
+      try {
+        existing = await findExistingDraftByReference(reference);
+      } catch {
+        return { status: 502, body: { error: "Could not verify an existing draft. No new product was created.", reference } };
+      }
       if (existing) {
         const verification = await verifyDraftProduct(existing);
         return {
@@ -156,7 +161,7 @@ export async function POST(req: NextRequest) {
           providerWarning: variantMap.warning,
           persistence,
           // The pipeline only succeeded if Shopify agrees AND QA did not reject.
-          pipelineOk: verification.verified && qa.verdict !== "REJECTED",
+          pipelineOk: verification.verified && qa.verdict === "PASS",
           blocker: qa.verdict === "REJECTED" ? "ASSET REQUIRED — STUDIO" : undefined,
         },
       };
