@@ -61,7 +61,10 @@ export type CatalogProduct = {
 const APPAREL_COLORS: CatalogColor[] = [
   { id: "black", label: "Black", hex: "#111113", dark: true },
   { id: "charcoal", label: "Charcoal", hex: "#3f4247", dark: true },
+  { id: "navy", label: "Navy", hex: "#17365d", dark: true },
   { id: "royal", label: "Royal Blue", hex: "#1d4ed8", dark: true },
+  { id: "heritage-teal", label: "Heritage Teal", hex: "#1f6664", dark: true },
+  { id: "forest", label: "Forest Green", hex: "#174b3a", dark: true },
   { id: "white", label: "White", hex: "#f7f7f5", dark: false },
 ];
 
@@ -90,6 +93,24 @@ const BACK_FULL: PrintArea = {
   heightIn: 16,
   box: { top: 24, left: 30, width: 40, height: 44 },
   minPx: { width: 1800, height: 2400 },
+};
+
+const LEFT_SLEEVE: PrintArea = {
+  id: "left-sleeve",
+  label: "Left sleeve",
+  widthIn: 3.5,
+  heightIn: 12,
+  box: { top: 30, left: 8, width: 18, height: 50 },
+  minPx: { width: 525, height: 1800 },
+};
+
+const RIGHT_SLEEVE: PrintArea = {
+  id: "right-sleeve",
+  label: "Right sleeve",
+  widthIn: 3.5,
+  heightIn: 12,
+  box: { top: 30, left: 74, width: 18, height: 50 },
+  minPx: { width: 525, height: 1800 },
 };
 
 export const CATALOG: CatalogProduct[] = [
@@ -142,14 +163,14 @@ export const CATALOG: CatalogProduct[] = [
     id: "vf-longsleeve",
     handle: "vibeflex-long-sleeve",
     name: "VibeFlex Long Sleeve",
-    blurb: "Cotton long sleeve with room for a full-front or full-back print.",
+    blurb: "Cotton long sleeve with chest, back, and sleeve placement support.",
     category: "longsleeve",
     silhouette: "longsleeve",
     baseCostUsd: 13.5,
     printCostUsd: 5,
     colors: APPAREL_COLORS,
     sizes: APPAREL_SIZES,
-    printAreas: [FRONT_CENTER, BACK_FULL],
+    printAreas: [FRONT_CENTER, BACK_FULL, LEFT_SLEEVE, RIGHT_SLEEVE],
     provider: { printful: { catalogProductId: "37" } },
   },
 ];
