@@ -57,6 +57,16 @@ export type ProductionLineItem = {
   quantity: number;
   /** Provider-specific variant id (Printful variant id, or a local variant sku). */
   providerVariantId: string;
+  /**
+   * The catalog product (Printful "sync product"/catalog id, Printify
+   * blueprint id) this variant belongs to. Printful can place a raw order
+   * from providerVariantId alone; Printify's equivalent raw order mode needs
+   * this alongside the variant id, since the same numeric variant id is only
+   * meaningful within one blueprint + print provider. Optional in the shared
+   * type because not every provider requires it — a provider that does
+   * requires it gates on its absence in canProduce(), not at submit time.
+   */
+  catalogProductExternalId?: string;
   artworkUrl: string;
   /** Decoration method required for this item (lowercased). */
   technique: string;

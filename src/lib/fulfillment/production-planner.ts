@@ -49,6 +49,7 @@ function toProductionOrder(plan: FulfillmentPlan): {
       sku: item.studioReference ?? item.lineItemId,
       quantity: item.quantity,
       providerVariantId,
+      catalogProductExternalId: item.catalogProductExternalId,
       artworkUrl: item.artworkUrl ?? "",
       technique: item.technique,
       printAreaId: geo?.printAreaId ?? "front",

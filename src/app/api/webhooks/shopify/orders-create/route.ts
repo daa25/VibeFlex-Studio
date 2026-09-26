@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { buildFulfillmentPlan, type ShopifyOrderPayload } from "@/lib/fulfillment/order-mapper";
 import { planProduction } from "@/lib/fulfillment/production-planner";
-import { getProductionProviders } from "@/lib/fulfillment/production-runtime";
+import { getConfiguredProductionProviders } from "@/lib/fulfillment/production-runtime";
 import { recordOrderLine } from "@/lib/repository";
 
 export const runtime = "nodejs";
@@ -49,7 +49,12 @@ export async function POST(req: NextRequest) {
   // when no external vendor is configured. This PLANS and ROUTES only — it
   // never submits. External routes carry requiresApproval so nothing paid is
   // sent to a vendor without explicit owner authorization.
-  const production = await planProduction(plan, getProductionProviders());
+  //
+  // getConfiguredProductionProviders() builds real clients from environment
+  // credentials — this used to be getProductionProviders() with no arguments,
+  // which registered ONLY the in-house line regardless of POD_PROVIDER,
+  // because nothing ever constructed and passed in a real external client.
+  const production = await planProduction(plan, getConfiguredProductionProviders());
 
   // Always 200 after a verified signature: a non-2xx makes Shopify retry, and
   // a business-logic problem is not something a retry can fix.

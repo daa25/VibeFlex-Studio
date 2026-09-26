@@ -76,8 +76,13 @@ export class PrintifyProductionProvider implements ProductionProvider {
       return false;
     }
     // A provider variant id is mandatory for an external order — without it the
-    // printer has nothing to make.
-    return /^\d+$/.test(item.providerVariantId);
+    // printer has nothing to make. Printify additionally needs the blueprint
+    // id (catalogProductExternalId): the same numeric variant id is only
+    // meaningful within one blueprint + print provider, unlike Printful, which
+    // can place an order from a bare variant id. Gate here, not at submission
+    // time, so routing skips Printify for this line instead of failing after
+    // it has already been chosen.
+    return /^\d+$/.test(item.providerVariantId) && Boolean(item.catalogProductExternalId);
   }
 
   estimateUnitCost(

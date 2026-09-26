@@ -21,6 +21,7 @@ function beanieOrder(overrides: Partial<ProductionOrderInput> = {}): ProductionO
         sku: "490-UNC-BEANIE-BLK",
         quantity: 1,
         providerVariantId: "17390",
+        catalogProductExternalId: "12",
         artworkUrl: "https://cdn.example.com/beanie.png",
         technique: "embroidery",
         printAreaId: "embroidery_front",

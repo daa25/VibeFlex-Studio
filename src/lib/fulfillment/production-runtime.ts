@@ -14,11 +14,14 @@ import {
   PrintfulProductionProvider,
   type PrintfulOrderClient,
 } from "@/integrations/pod/providers/printful-production-provider";
+import { createPrintfulOrderClient } from "@/integrations/pod/printful/order-client";
 import {
   PrintifyProductionProvider,
   type PrintifyOrderClient,
 } from "@/integrations/pod/providers/printify-production-provider";
+import { createPrintifyOrderClient } from "@/integrations/pod/printify/order-client";
 import type { ProductionProvider } from "@/integrations/pod/production-types";
+import { env } from "@/lib/env";
 
 export type ProductionRuntimeOptions = {
   /**
@@ -59,4 +62,31 @@ export function getProductionProviders(
   opts: ProductionRuntimeOptions = {}
 ): ProductionProvider[] {
   return buildProductionRegistry(opts).list();
+}
+
+/**
+ * The list of providers to route an order across, built from real
+ * environment configuration rather than test-injected fakes. This is what the
+ * live order webhook calls.
+ *
+ * Only a provider whose credentials are actually present gets a real client
+ * constructed and registered — an unconfigured provider is silently absent,
+ * not a startup error, matching this codebase's "nothing throws on missing
+ * config" rule. Today that means only Printify registers for this store:
+ * Printful has no credentials configured, so PRINTFUL_API_KEY /
+ * PRINTFUL_STORE_ID being unset means createPrintfulOrderClient is never
+ * called and Printful is simply not in the registry.
+ */
+export function getConfiguredProductionProviders(): ProductionProvider[] {
+  const printfulKey = env.printfulApiKey();
+  const printfulStore = env.printfulStoreId();
+  const printifyKey = env.printifyApiKey();
+  const printifyShop = env.printifyShopId();
+
+  return getProductionProviders({
+    printfulClient:
+      printfulKey && printfulStore ? createPrintfulOrderClient(printfulKey, printfulStore) : undefined,
+    printifyClient:
+      printifyKey && printifyShop ? createPrintifyOrderClient(printifyKey, printifyShop) : undefined,
+  });
 }

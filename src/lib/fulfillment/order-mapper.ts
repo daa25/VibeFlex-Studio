@@ -50,6 +50,8 @@ export type FulfillmentItem = {
   artworkUrl?: string;
   provider: string;
   providerVariantId?: string;
+  /** Printful "sync product"/catalog id, Printify blueprint id. See production-types.ts. */
+  catalogProductExternalId?: string;
   /** Decoration method for this line (lowercased). Drives production routing. */
   technique: string;
   /** Per-unit retail the customer paid, for margin routing. */
@@ -137,6 +139,7 @@ export function buildFulfillmentPlan(
       artworkUrl,
       provider: prop(line, "_pod_provider") ?? defaultProvider,
       providerVariantId,
+      catalogProductExternalId: prop(line, "_provider_catalog_product_id"),
       technique: (prop(line, "_technique") ?? "dtg").toLowerCase(),
       unitPrice,
       geometry,
