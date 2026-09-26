@@ -54,6 +54,13 @@ export type CatalogProduct = {
     printify?: { blueprintId: string; printProviderId: string };
     gelato?: { productUid: string };
   };
+  /**
+   * Decoration method Studio should record on orders for this product
+   * (lowercased — feeds ProductionLineItem.technique for routing). Defaults
+   * to "dtg" at the point of use when a product does not set this, since DTG
+   * is the standard method for the apparel this catalog currently models.
+   */
+  technique?: string;
   /** Optional: Shopify product handle this maps to, once published. */
   shopifyHandle?: string;
 };

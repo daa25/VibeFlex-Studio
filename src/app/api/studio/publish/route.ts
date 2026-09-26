@@ -55,7 +55,8 @@ export async function POST(req: NextRequest) {
     const providerRefs = {
       mode: variantMap.mode,
       variantIdsByColorSize: variantMap.map,
-      catalogProductId: design.product.provider.printful?.catalogProductId ?? null,
+      providerName: variantMap.providerName ?? null,
+      catalogProductId: variantMap.catalogProductExternalId ?? null,
     };
 
     if (!body.reference) {

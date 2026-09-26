@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCart, type CartAttribute } from "@/integrations/shopify/storefront-client";
+import { slug } from "@/integrations/pod/catalog-service";
 import { getDesignByReference, setDesignCheckoutUrl } from "@/lib/repository";
 import { env } from "@/lib/env";
 import { prepareDesign, withIdempotency } from "@/lib/studio-service";
+import type { ResolvedDesign } from "@/lib/design";
+
+/**
+ * Resolves the real supplier variant id for this design's chosen color/size
+ * out of the map computed at publish time (getProviderVariantMap, stored on
+ * the design row as providerRefs.variantIdsByColorSize). Tries the studio's
+ * own color id first, then the slugified color LABEL — the same fallback
+ * mergeProviderData uses, because a studio color id ("royal") does not always
+ * equal slug(providerColorLabel) ("royalblue" for "Royal Blue").
+ */
+function resolveProviderVariantId(
+  design: ResolvedDesign,
+  variantMap: Record<string, string> | undefined
+): string | undefined {
+  if (!variantMap) return undefined;
+  const sizeKey = design.size.id.toUpperCase();
+  return (
+    variantMap[`${design.color.id}/${sizeKey}`] ??
+    variantMap[`${slug(design.color.label)}/${sizeKey}`]
+  );
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,10 +71,14 @@ export async function POST(req: NextRequest) {
   const { design, pricing, geometry, provider } = prepared.value;
 
   // Resolve the variant to buy: explicit merchandiseId wins, otherwise the
-  // published Shopify variant recorded against the saved design.
+  // published Shopify variant recorded against the saved design. The same
+  // saved-design row also carries the provider variant map computed at
+  // publish time (getProviderVariantMap), which is the only source for the
+  // fulfillment properties below — cart creation does not call a POD
+  // provider itself.
+  const saved = body.reference ? await getDesignByReference(body.reference) : null;
   let merchandiseId = body.merchandiseId;
-  if (!merchandiseId && body.reference) {
-    const saved = await getDesignByReference(body.reference);
+  if (!merchandiseId) {
     merchandiseId = saved?.shopifyVariantIds?.[0];
   }
   if (!merchandiseId) {
@@ -66,6 +92,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const providerRefs = (saved?.providerRefs ?? {}) as {
+    variantIdsByColorSize?: Record<string, string>;
+    catalogProductId?: string | null;
+  };
+  const providerVariantId = resolveProviderVariantId(design, providerRefs.variantIdsByColorSize);
+
   const attributes: CartAttribute[] = [
     { key: "Studio reference", value: body.reference ?? "unsaved" },
     { key: "Product", value: design.product.name },
@@ -77,6 +109,14 @@ export async function POST(req: NextRequest) {
     { key: "_print_geometry_in", value: JSON.stringify(geometry) },
     { key: "_pod_provider", value: provider },
     { key: "_unit_cost_usd", value: pricing.unitCost.toFixed(2) },
+    { key: "_technique", value: design.product.technique ?? "dtg" },
+    // Omitted (rather than written as an empty string) when unresolved, so
+    // buildFulfillmentPlan's existing "no supplier variant id" blocker fires
+    // with its real, specific message instead of failing on an empty value.
+    ...(providerVariantId ? [{ key: "_provider_variant_id", value: providerVariantId }] : []),
+    ...(providerRefs.catalogProductId
+      ? [{ key: "_provider_catalog_product_id", value: providerRefs.catalogProductId }]
+      : []),
   ];
 
   const result = await withIdempotency(req.headers.get("Idempotency-Key"), async () => {
