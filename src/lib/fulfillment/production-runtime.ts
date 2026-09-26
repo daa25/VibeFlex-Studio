@@ -14,6 +14,10 @@ import {
   PrintfulProductionProvider,
   type PrintfulOrderClient,
 } from "@/integrations/pod/providers/printful-production-provider";
+import {
+  PrintifyProductionProvider,
+  type PrintifyOrderClient,
+} from "@/integrations/pod/providers/printify-production-provider";
 import type { ProductionProvider } from "@/integrations/pod/production-types";
 
 export type ProductionRuntimeOptions = {
@@ -23,6 +27,11 @@ export type ProductionRuntimeOptions = {
    * registered — Studio still produces through the in-house line.
    */
   printfulClient?: PrintfulOrderClient;
+  /**
+   * A live Printify order client. Same additive, approval-gated contract as
+   * printfulClient — omit it and Printify is simply not registered.
+   */
+  printifyClient?: PrintifyOrderClient;
   /** Override the in-house provider (tests inject a deterministic store/clock). */
   localProvider?: VibeFlexLocalProvider;
 };
@@ -38,6 +47,9 @@ export function buildProductionRegistry(
   registry.register(opts.localProvider ?? new VibeFlexLocalProvider());
   if (opts.printfulClient) {
     registry.register(new PrintfulProductionProvider({ client: opts.printfulClient }));
+  }
+  if (opts.printifyClient) {
+    registry.register(new PrintifyProductionProvider({ client: opts.printifyClient }));
   }
   return registry;
 }
