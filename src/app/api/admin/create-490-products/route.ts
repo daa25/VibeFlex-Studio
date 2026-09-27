@@ -18,8 +18,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getPrintifyAdapter } from "@/integrations/pod/catalog-service";
-import type { PrintifyAdapter } from "@/integrations/pod/printify/adapter";
-import type { PodProduct } from "@/integrations/pod/types";
+import { findBlueprint } from "@/integrations/pod/printify/blueprint-catalog";
+import { firstPrintAreaId, markupRetailPrice } from "@/integrations/pod/printify/product-creation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
 
       const retailPriceByVariant: Record<string, number> = {};
       for (const v of available) {
-        retailPriceByVariant[v.externalId] = retailPrice(v.baseCost);
+        retailPriceByVariant[v.externalId] = markupRetailPrice(v.baseCost);
       }
 
       const product = await adapter.createFulfillmentProduct({
@@ -140,26 +140,3 @@ export async function GET(req: NextRequest) {
   });
 }
 
-function findBlueprint(catalog: PodProduct[], keywords: string[]): PodProduct | null {
-  for (const keyword of keywords) {
-    const match = catalog.find((item) => item.name.toLowerCase().includes(keyword.toLowerCase()));
-    if (match) return match;
-  }
-  return null;
-}
-
-async function firstPrintAreaId(
-  adapter: PrintifyAdapter,
-  blueprintId: string,
-  variantId: string
-): Promise<string | null> {
-  const placeholders = await adapter.getPlaceholders(blueprintId, variantId);
-  const [firstKey] = Object.keys(placeholders);
-  return firstKey ?? null;
-}
-
-function retailPrice(baseCost: number): number {
-  if (!Number.isFinite(baseCost) || baseCost <= 0) return 24.99;
-  const marked = baseCost * 1.55;
-  return Math.floor(marked) + 0.99;
-}
