@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/impact/performance-sync",
+      "schedule": "0 13 * * *"
+    }
+  ]
+}

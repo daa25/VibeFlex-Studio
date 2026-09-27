@@ -36,6 +36,18 @@ export const env = {
 
   openaiApiKey: () => read("OPENAI_API_KEY"),
 
+  // Impact.com — two separate accounts per the two-sided model documented in
+  // Impact-Affiliate-Architecture: Side A (publisher, you promote partner
+  // brands) and Side B (advertiser, other publishers promote your catalog).
+  // Never conflate these two credential pairs.
+  impactPublisherAccountSid: () => read("IMPACT_PUBLISHER_ACCOUNT_SID"),
+  impactPublisherAuthToken: () => read("IMPACT_PUBLISHER_AUTH_TOKEN"),
+  impactAdvertiserAccountSid: () => read("IMPACT_ADVERTISER_ACCOUNT_SID"),
+  impactAdvertiserAuthToken: () => read("IMPACT_ADVERTISER_AUTH_TOKEN"),
+
+  airtableApiKey: () => read("AIRTABLE_API_KEY"),
+  airtableBaseId: () => read("AIRTABLE_BASE_ID") ?? "appuaF1jfeBr2PPqn",
+
   adminAllowedEmails: () =>
     (read("ADMIN_ALLOWED_EMAILS") ?? "")
       .split(",")
@@ -98,6 +110,16 @@ export function serviceStatuses(): ServiceStatus[] {
             ["PRINTFUL_STORE_ID", env.printfulStoreId()],
           ]);
 
+  const impactPublisher = miss([
+    ["IMPACT_PUBLISHER_ACCOUNT_SID", env.impactPublisherAccountSid()],
+    ["IMPACT_PUBLISHER_AUTH_TOKEN", env.impactPublisherAuthToken()],
+  ]);
+  const impactAdvertiser = miss([
+    ["IMPACT_ADVERTISER_ACCOUNT_SID", env.impactAdvertiserAccountSid()],
+    ["IMPACT_ADVERTISER_AUTH_TOKEN", env.impactAdvertiserAuthToken()],
+  ]);
+  const airtable = miss([["AIRTABLE_API_KEY", env.airtableApiKey()]]);
+
   return [
     {
       key: "database",
@@ -140,6 +162,27 @@ export function serviceStatuses(): ServiceStatus[] {
       configured: fulfillment.length === 0,
       missing: fulfillment,
       note: "Mockup generation and order routing to production.",
+    },
+    {
+      key: "impact_publisher",
+      label: "Impact.com (Side A — publisher)",
+      configured: impactPublisher.length === 0,
+      missing: impactPublisher,
+      note: "Pulls click/conversion/commission performance for the partner brands you promote.",
+    },
+    {
+      key: "impact_advertiser",
+      label: "Impact.com (Side B — advertiser)",
+      configured: impactAdvertiser.length === 0,
+      missing: impactAdvertiser,
+      note: "Serves /api/impact/catalog-feed for outside affiliates to discover your products.",
+    },
+    {
+      key: "airtable",
+      label: "Airtable (command center sync)",
+      configured: airtable.length === 0,
+      missing: airtable,
+      note: "Writes Impact.com performance data into the Publisher_Partners / Affiliate_Links tables.",
     },
   ];
 }
