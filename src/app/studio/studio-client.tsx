@@ -45,6 +45,8 @@ export function StudioClient({ products, catalogMode, persistentStorage, shopify
 
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [removingBg, setRemovingBg] = useState(false);
+  const [bgRemovalError, setBgRemovalError] = useState<string | null>(null);
   const [submitState, setSubmitState] = useState<"idle" | "saving" | "publishing" | "carting">("idle");
   const [result, setResult] = useState<{ kind: "saved" | "published" | "cart"; message: string; url?: string } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -151,6 +153,31 @@ export function StudioClient({ products, catalogMode, persistentStorage, shopify
     };
     xhr.send(body);
   }, []);
+
+  const removeBackground = useCallback(async () => {
+    if (!artwork) return;
+    setBgRemovalError(null);
+    setRemovingBg(true);
+    try {
+      const res = await fetch("/api/uploads/remove-background", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artwork: { url: artwork.url, fileName: artwork.fileName } }),
+      });
+      const payload = (await res.json()) as UploadResponse & { error?: string };
+      if (!res.ok || payload.error) {
+        setBgRemovalError(payload.error ?? `Background removal failed (${res.status}).`);
+        return;
+      }
+      setArtwork(payload.artwork);
+      setAnalysis(payload.analysis);
+      setStorage(payload.storage);
+    } catch (err) {
+      setBgRemovalError(err instanceof Error ? err.message : "Background removal failed.");
+    } finally {
+      setRemovingBg(false);
+    }
+  }, [artwork]);
 
   const pricing = useMemo(() => {
     if (!product) return null;
@@ -302,7 +329,12 @@ export function StudioClient({ products, catalogMode, persistentStorage, shopify
               </p>
             )}
 
-            <AnalysisPanel analysis={analysis} />
+            <AnalysisPanel
+              analysis={analysis}
+              onRemoveBackground={removeBackground}
+              removingBg={removingBg}
+              bgRemovalError={bgRemovalError}
+            />
 
             <Panel title="Product">
               <div className="grid gap-2 sm:grid-cols-2">
@@ -607,7 +639,17 @@ function UploadPanel({
   );
 }
 
-function AnalysisPanel({ analysis }: { analysis: UploadResponse["analysis"] | null }) {
+function AnalysisPanel({
+  analysis,
+  onRemoveBackground,
+  removingBg,
+  bgRemovalError,
+}: {
+  analysis: UploadResponse["analysis"] | null;
+  onRemoveBackground: () => void;
+  removingBg: boolean;
+  bgRemovalError: string | null;
+}) {
   if (!analysis) return null;
   const { deterministic, ai, aiStatus, aiMessage } = analysis;
 
@@ -633,6 +675,24 @@ function AnalysisPanel({ analysis }: { analysis: UploadResponse["analysis"] | nu
           {w}
         </p>
       ))}
+
+      {!deterministic.hasTransparency && (
+        <div className="mt-2 rounded-lg bg-amber-500/10 px-3 py-2">
+          <button
+            type="button"
+            onClick={onRemoveBackground}
+            disabled={removingBg}
+            className="rounded-md bg-amber-400/90 px-3 py-1.5 text-xs font-medium text-neutral-900 disabled:opacity-60"
+          >
+            {removingBg ? "Removing background…" : "Remove background"}
+          </button>
+          <p className="mt-1 text-[11px] text-amber-200/80">
+            Cuts out the background and replaces your artwork with a transparent version. Your
+            original stays uploaded — this creates a new version rather than overwriting it.
+          </p>
+          {bgRemovalError && <p className="mt-1 text-[11px] text-red-300">{bgRemovalError}</p>}
+        </div>
+      )}
 
       {aiStatus !== "ok" && (
         <p className="mt-2 text-[11px] text-neutral-500">

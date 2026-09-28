@@ -35,6 +35,7 @@ export const env = {
   gelatoApiKey: () => read("GELATO_API_KEY"),
 
   openaiApiKey: () => read("OPENAI_API_KEY"),
+  removeBgApiKey: () => read("REMOVEBG_API_KEY"),
 
   // Impact.com — two separate accounts per the two-sided model documented in
   // Impact-Affiliate-Architecture: Side A (publisher, you promote partner
@@ -119,6 +120,7 @@ export function serviceStatuses(): ServiceStatus[] {
     ["IMPACT_ADVERTISER_AUTH_TOKEN", env.impactAdvertiserAuthToken()],
   ]);
   const airtable = miss([["AIRTABLE_API_KEY", env.airtableApiKey()]]);
+  const backgroundRemoval = miss([["REMOVEBG_API_KEY", env.removeBgApiKey()]]);
 
   return [
     {
@@ -183,6 +185,13 @@ export function serviceStatuses(): ServiceStatus[] {
       configured: airtable.length === 0,
       missing: airtable,
       note: "Writes Impact.com performance data into the Publisher_Partners / Affiliate_Links tables.",
+    },
+    {
+      key: "background_removal",
+      label: "Background removal (remove.bg)",
+      configured: backgroundRemoval.length === 0,
+      missing: backgroundRemoval,
+      note: "Powers the 'Remove background' action on uploaded artwork with no transparency.",
     },
   ];
 }

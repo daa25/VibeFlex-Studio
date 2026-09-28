@@ -21,13 +21,13 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import type { AiAnalysis } from "@/lib/artwork-analysis";
-import { env } from "@/lib/env";
 import { generateProductCopy } from "@/lib/product-copy";
 import { getPrintifyAdapter } from "@/integrations/pod/catalog-service";
 import { STARTER_BLUEPRINT_TARGETS, findBlueprint } from "@/integrations/pod/printify/blueprint-catalog";
 import { firstPrintAreaId, markupRetailPrice } from "@/integrations/pod/printify/product-creation";
 import { rehostArtworkToShopify } from "@/integrations/shopify/files";
 import { publishPodDraftProduct } from "@/integrations/shopify/publish-pod-product";
+import { resolvePublicUrl } from "@/lib/url";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -82,9 +82,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const absoluteSourceUrl = /^https?:\/\//.test(body.artwork.url)
-    ? body.artwork.url
-    : `${env.publicBaseUrl() ?? ""}${body.artwork.url}`;
+  const absoluteSourceUrl = resolvePublicUrl(body.artwork.url);
   if (!/^https:\/\//.test(absoluteSourceUrl)) {
     return NextResponse.json(
       {
