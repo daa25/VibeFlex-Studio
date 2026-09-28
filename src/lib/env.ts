@@ -35,7 +35,9 @@ export const env = {
   gelatoApiKey: () => read("GELATO_API_KEY"),
 
   openaiApiKey: () => read("OPENAI_API_KEY"),
-  poofApiKey: () => read("POOF_API_KEY"),
+  // Accept PROOFBG_API_KEY too — a real key was set under that name before
+  // the exact env var name was confirmed; no need to re-add it.
+  poofApiKey: () => read("POOF_API_KEY") ?? read("PROOFBG_API_KEY"),
 
   // Impact.com — two separate accounts per the two-sided model documented in
   // Impact-Affiliate-Architecture: Side A (publisher, you promote partner
