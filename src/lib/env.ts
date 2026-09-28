@@ -35,7 +35,7 @@ export const env = {
   gelatoApiKey: () => read("GELATO_API_KEY"),
 
   openaiApiKey: () => read("OPENAI_API_KEY"),
-  removeBgApiKey: () => read("REMOVEBG_API_KEY"),
+  poofApiKey: () => read("POOF_API_KEY"),
 
   // Impact.com — two separate accounts per the two-sided model documented in
   // Impact-Affiliate-Architecture: Side A (publisher, you promote partner
@@ -120,7 +120,7 @@ export function serviceStatuses(): ServiceStatus[] {
     ["IMPACT_ADVERTISER_AUTH_TOKEN", env.impactAdvertiserAuthToken()],
   ]);
   const airtable = miss([["AIRTABLE_API_KEY", env.airtableApiKey()]]);
-  const backgroundRemoval = miss([["REMOVEBG_API_KEY", env.removeBgApiKey()]]);
+  const backgroundRemoval = miss([["POOF_API_KEY", env.poofApiKey()]]);
 
   return [
     {
@@ -188,7 +188,7 @@ export function serviceStatuses(): ServiceStatus[] {
     },
     {
       key: "background_removal",
-      label: "Background removal (remove.bg)",
+      label: "Background removal (Poof)",
       configured: backgroundRemoval.length === 0,
       missing: backgroundRemoval,
       note: "Powers the 'Remove background' action on uploaded artwork with no transparency.",
