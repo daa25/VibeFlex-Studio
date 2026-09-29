@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Design Studio — VibeFlex Sports",
-  description: "Upload your artwork, put it on VibeFlex gear, and see it before you buy.",
+  description: "Upload artwork, configure VibeFlex gear, and manage approved production originals.",
 };
 
 export default async function StudioPage() {
@@ -24,15 +24,23 @@ export default async function StudioPage() {
           </p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">Design Studio</h1>
           <p className="mt-2 max-w-xl text-sm text-neutral-400">
-            Upload your artwork, drop it on real VibeFlex gear, and see exactly what gets printed.
+            Upload artwork, build new products, or open the approved VibeFlex Originals production blueprints.
           </p>
         </div>
-        <Link
-          href="/store"
-          className="self-start rounded-lg border border-neutral-800 px-3 py-2 text-sm text-neutral-300 transition hover:border-neutral-600 hover:text-white"
-        >
-          Browse the store
-        </Link>
+        <div className="flex flex-wrap gap-2 self-start">
+          <Link
+            href="/studio/originals"
+            className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 py-2 text-sm font-medium text-blue-200 transition hover:border-blue-400 hover:bg-blue-500/20 hover:text-white"
+          >
+            VibeFlex Originals
+          </Link>
+          <Link
+            href="/store"
+            className="rounded-lg border border-neutral-800 px-3 py-2 text-sm text-neutral-300 transition hover:border-neutral-600 hover:text-white"
+          >
+            Browse the store
+          </Link>
+        </div>
       </header>
 
       {catalog.mode === "mock" && (
