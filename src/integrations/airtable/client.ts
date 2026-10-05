@@ -17,6 +17,50 @@ export class AirtableNotConfiguredError extends Error {
   }
 }
 
+export type AirtableRecord = { id: string; fields: Record<string, unknown> };
+
+/**
+ * Reads records from a table, paginating through Airtable's 100-per-page
+ * limit automatically. Field names in `fields` are as configured in
+ * Airtable — pass field IDs (fldXXXXXXXXXXXXXX) if you need renames to be
+ * non-breaking, since Airtable accepts either in the `fields` query param.
+ */
+export async function listAirtableRecords(
+  tableId: string,
+  options?: { fields?: string[]; filterByFormula?: string }
+): Promise<AirtableRecord[]> {
+  const apiKey = env.airtableApiKey();
+  if (!apiKey) throw new AirtableNotConfiguredError();
+
+  const records: AirtableRecord[] = [];
+  let offset: string | undefined;
+
+  do {
+    const params = new URLSearchParams();
+    for (const f of options?.fields ?? []) params.append("fields[]", f);
+    if (options?.filterByFormula) params.set("filterByFormula", options.filterByFormula);
+    if (offset) params.set("offset", offset);
+
+    const res = await fetch(
+      `${AIRTABLE_API_BASE}/${env.airtableBaseId()}/${encodeURIComponent(tableId)}?${params}`,
+      {
+        headers: { Authorization: `Bearer ${apiKey}` },
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`Airtable API error (${res.status}): ${(await res.text()).slice(0, 400)}`);
+    }
+
+    const json = (await res.json()) as { records?: AirtableRecord[]; offset?: string };
+    records.push(...(json.records ?? []));
+    offset = json.offset;
+  } while (offset);
+
+  return records;
+}
+
 export async function createAirtableRecords(
   tableName: string,
   records: Array<{ fields: Record<string, unknown> }>
