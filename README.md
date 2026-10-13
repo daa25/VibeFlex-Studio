@@ -4,6 +4,19 @@ A commerce-operations platform designed to move a product from artwork and confi
 
 The project treats ecommerce as an operational pipeline rather than a collection of disconnected tools. Product data, artwork, fulfillment, mockups, publishing, and audit history are modeled as parts of one repeatable system.
 
+## Automated workspace setup
+
+Run `npm run setup:environment` from a fresh checkout with Node.js 22 or newer.
+It installs the locked dependencies, checks TypeScript, runs the test suite,
+builds the application, and reports missing configuration names without
+displaying credentials. It does not deploy, migrate databases, create products,
+or submit fulfillment orders.
+
+`npm run check:environment` reports configuration only. A passing build and
+present credentials do not establish that live service access works. Store
+local credentials in the ignored `.env.local` file and keep production secrets
+in the correct hosting project's environment settings.
+
 ## What the project demonstrates
 
 - End-to-end product workflow design

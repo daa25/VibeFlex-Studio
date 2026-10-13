@@ -22,9 +22,9 @@ export const env = {
   // OAuth / Shopify-managed installation alternative to a static admin token.
   shopifyClientId: () => read("SHOPIFY_CLIENT_ID"),
   shopifyClientSecret: () => read("SHOPIFY_CLIENT_SECRET"),
-  shopifyAdminApiVersion: () => read("SHOPIFY_API_VERSION") ?? "2025-01",
+  shopifyAdminApiVersion: () => read("SHOPIFY_API_VERSION") ?? "2026-10",
   shopifyStorefrontToken: () => read("SHOPIFY_STOREFRONT_ACCESS_TOKEN"),
-  shopifyStorefrontApiVersion: () => read("SHOPIFY_STOREFRONT_API_VERSION") ?? "2025-01",
+  shopifyStorefrontApiVersion: () => read("SHOPIFY_STOREFRONT_API_VERSION") ?? "2026-10",
   shopifyWebhookSecret: () => read("SHOPIFY_WEBHOOK_SECRET"),
 
   podProvider: () => (read("POD_PROVIDER") ?? "printful").toLowerCase(),

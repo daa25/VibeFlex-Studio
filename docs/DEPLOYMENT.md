@@ -73,14 +73,14 @@ token's prefix (`shpat_` is a convention, not a rule).
 **Model A — direct Admin API access token**
 
 ```
-SHOPIFY_SHOP_DOMAIN=hbipmy-3g.myshopify.com
+SHOPIFY_SHOP_DOMAIN=vibeflex-813.myshopify.com
 SHOPIFY_ADMIN_API_ACCESS_TOKEN=<token>
 ```
 
 **Model B — OAuth client credentials (Shopify-managed installation)**
 
 ```
-SHOPIFY_SHOP_DOMAIN=hbipmy-3g.myshopify.com
+SHOPIFY_SHOP_DOMAIN=vibeflex-813.myshopify.com
 SHOPIFY_CLIENT_ID=<client id>
 SHOPIFY_CLIENT_SECRET=<client secret>
 ```

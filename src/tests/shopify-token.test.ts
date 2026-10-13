@@ -28,7 +28,7 @@ describe("shopify admin credential resolution", () => {
   });
 
   it("accepts a static admin token of any prefix without a network call", async () => {
-    process.env.SHOPIFY_SHOP_DOMAIN = "hbipmy-3g.myshopify.com";
+    process.env.SHOPIFY_SHOP_DOMAIN = "vibeflex-813.myshopify.com";
     process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN = "atkn_not_a_legacy_prefix";
     const fetchSpy = vi.fn();
     vi.stubGlobal("fetch", fetchSpy);
@@ -41,7 +41,7 @@ describe("shopify admin credential resolution", () => {
   });
 
   it("exchanges client credentials once and caches the result", async () => {
-    process.env.SHOPIFY_SHOP_DOMAIN = "hbipmy-3g.myshopify.com";
+    process.env.SHOPIFY_SHOP_DOMAIN = "vibeflex-813.myshopify.com";
     delete process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN;
     process.env.SHOPIFY_CLIENT_ID = "client-id";
     process.env.SHOPIFY_CLIENT_SECRET = "client-secret";
@@ -59,7 +59,7 @@ describe("shopify admin credential resolution", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
 
     const [url, init] = fetchSpy.mock.calls[0]!;
-    expect(url).toBe("https://hbipmy-3g.myshopify.com/admin/oauth/access_token");
+    expect(url).toBe("https://vibeflex-813.myshopify.com/admin/oauth/access_token");
     expect(JSON.parse(init.body as string).grant_type).toBe("client_credentials");
 
     resetAdminTokenCache();
@@ -68,7 +68,7 @@ describe("shopify admin credential resolution", () => {
   });
 
   it("surfaces a useful message when Shopify refuses the exchange", async () => {
-    process.env.SHOPIFY_SHOP_DOMAIN = "hbipmy-3g.myshopify.com";
+    process.env.SHOPIFY_SHOP_DOMAIN = "vibeflex-813.myshopify.com";
     delete process.env.SHOPIFY_ADMIN_API_ACCESS_TOKEN;
     process.env.SHOPIFY_CLIENT_ID = "client-id";
     process.env.SHOPIFY_CLIENT_SECRET = "wrong-secret";
