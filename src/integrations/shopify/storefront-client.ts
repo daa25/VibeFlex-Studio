@@ -12,7 +12,7 @@
 const SHOPIFY_STOREFRONT_DOMAIN = process.env.SHOPIFY_SHOP_DOMAIN as string;
 const SHOPIFY_STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN as string;
 const SHOPIFY_STOREFRONT_API_VERSION =
-  process.env.SHOPIFY_STOREFRONT_API_VERSION ?? "2025-01";
+  process.env.SHOPIFY_STOREFRONT_API_VERSION ?? "2026-10";
 
 if (!SHOPIFY_STOREFRONT_DOMAIN) {
   // Thrown lazily at call time in dev if envs aren't set yet — keeps this
