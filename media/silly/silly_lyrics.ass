@@ -1,0 +1,87 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 2
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Lyric,Courier Prime,62,&H00E6F4FA,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,1,0,1,4,2,2,60,60,230,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:01.00,Lyric,,0,0,0,,{\fad(80,0)}CARDS OF LIFE, BUT STILL\NLIVIN'
+Dialogue: 0,0:00:01.00,0:00:02.00,Lyric,,0,0,0,,{\fad(80,0)}LIKE IT'S GOLDEN
+Dialogue: 0,0:00:02.00,0:00:03.50,Lyric,,0,0,0,,{\fad(80,0)}SEE I'VE LEARNED WHEN TO\NHOLD 'EM
+Dialogue: 0,0:00:03.50,0:00:05.50,Lyric,,0,0,0,,{\fad(80,0)}AND I'VE LEARNED WHEN TO\NFOLD 'EM
+Dialogue: 0,0:00:05.50,0:00:06.50,Lyric,,0,0,0,,{\fad(80,0)}LEARN WHO TO TRUST\N'CAUSE THEY'LL
+Dialogue: 0,0:00:06.50,0:00:08.00,Lyric,,0,0,0,,{\fad(80,0)}TAKE ALL YA GOT
+Dialogue: 0,0:00:08.00,0:00:09.00,Lyric,,0,0,0,,{\fad(80,0)}PAY ATTENTION TO\NCHARACTER
+Dialogue: 0,0:00:09.00,0:00:10.50,Lyric,,0,0,0,,{\fad(80,0)}AND WATCH OUT FOR THE\NPLOT
+Dialogue: 0,0:00:10.50,0:00:12.50,Lyric,,0,0,0,,{\fad(80,0)}JUST A YOUNG BLACK MALE,
+Dialogue: 0,0:00:12.50,0:00:14.00,Lyric,,0,0,0,,{\fad(80,0)}OLD MAN WISDOM
+Dialogue: 0,0:00:14.00,0:00:15.00,Lyric,,0,0,0,,{\fad(80,0)}TRYNA DODGE PRISON
+Dialogue: 0,0:00:15.00,0:00:16.50,Lyric,,0,0,0,,{\fad(80,0)}THOSE THAT DIDN'T, YEAH\NWE MISS 'EM
+Dialogue: 0,0:00:16.50,0:00:18.00,Lyric,,0,0,0,,{\fad(80,0)}GOT COPS KILLING BLACKS,
+Dialogue: 0,0:00:18.00,0:00:20.00,Lyric,,0,0,0,,{\fad(80,0)}AND WHITES KILLING\NBLACKS,
+Dialogue: 0,0:00:20.00,0:00:21.00,Lyric,,0,0,0,,{\fad(80,0)}AND BLACKS KILLING\NBLACKS
+Dialogue: 0,0:00:21.00,0:00:22.50,Lyric,,0,0,0,,{\fad(80,0)}TELL ME HOW YOU DEAL\NWITH THAT?
+Dialogue: 0,0:00:22.50,0:00:24.00,Lyric,,0,0,0,,{\fad(80,0)}THEY JUDGE A BROTHER\NSOMETHING LIKE
+Dialogue: 0,0:00:24.00,0:00:25.00,Lyric,,0,0,0,,{\fad(80,0)}THE COVER OF A BOOK
+Dialogue: 0,0:00:25.00,0:00:27.00,Lyric,,0,0,0,,{\fad(80,0)}THEY SUSPECT I'M A CROOK
+Dialogue: 0,0:00:27.00,0:00:28.00,Lyric,,0,0,0,,{\fad(80,0)}BASED ON THE WAY I LOOK
+Dialogue: 0,0:00:28.00,0:00:30.00,Lyric,,0,0,0,,{\fad(80,0)}WAY TOO MANY HOMIES\NDAILY HEADING
+Dialogue: 0,0:00:30.00,0:00:30.75,Lyric,,0,0,0,,{\fad(80,0)}TO THE BIG PEN
+Dialogue: 0,0:00:30.75,0:00:32.50,Lyric,,0,0,0,,{\fad(80,0)}THEM CATS COMING OUT\NWORSE
+Dialogue: 0,0:00:32.50,0:00:34.50,Lyric,,0,0,0,,{\fad(80,0)}THAN WHEN THEY CAME IN
+Dialogue: 0,0:00:34.50,0:00:35.50,Lyric,,0,0,0,,{\fad(80,0)}TEARS SPILL ON THE PAGE
+Dialogue: 0,0:00:35.50,0:00:36.50,Lyric,,0,0,0,,{\fad(80,0)}THERE'S NO PEACE WHEN\NYOU'RE RELEASED
+Dialogue: 0,0:00:36.50,0:00:37.50,Lyric,,0,0,0,,{\fad(80,0)}TO THE STREETS
+Dialogue: 0,0:00:37.50,0:00:39.00,Lyric,,0,0,0,,{\fad(80,0)}JUST TO PEEP THAT YOU\NSTILL IN A
+Dialogue: 0,0:00:39.00,0:00:39.50,Lyric,,0,0,0,,{\fad(80,0)}CAGE
+Dialogue: 0,0:00:39.50,0:00:41.00,Lyric,,0,0,0,,{\fad(80,0)}SOMETIMES I THINK THAT\NIT'LL NEVER
+Dialogue: 0,0:00:41.00,0:00:42.00,Lyric,,0,0,0,,{\fad(80,0)}GET BETTER
+Dialogue: 0,0:00:42.00,0:00:43.00,Lyric,,0,0,0,,{\fad(80,0)}THEY SUPPRESS OUR PAIN
+Dialogue: 0,0:00:43.00,0:00:44.50,Lyric,,0,0,0,,{\fad(80,0)}WHILE WE SEEK JUSTICE\NFROM THE FOLK
+Dialogue: 0,0:00:44.50,0:00:46.00,Lyric,,0,0,0,,{\fad(80,0)}WHO OPPRESS US
+Dialogue: 0,0:00:46.00,0:00:47.50,Lyric,,0,0,0,,{\fad(80,0)}I BELIEVED IN YOU
+Dialogue: 0,0:00:47.50,0:00:52.00,Lyric,,0,0,0,,{\fad(80,0)}THOUGHT WHAT YOU SAID\NWAS TRUE
+Dialogue: 0,0:00:52.00,0:00:54.50,Lyric,,0,0,0,,{\fad(80,0)}IT DIDN'T OCCUR TO ME
+Dialogue: 0,0:00:54.50,0:00:57.00,Lyric,,0,0,0,,{\fad(80,0)}IT WAS A LIE
+Dialogue: 0,0:01:00.50,0:01:02.50,Lyric,,0,0,0,,{\fad(80,0)}HAHA HAAA
+Dialogue: 0,0:01:02.50,0:01:05.50,Lyric,,0,0,0,,{\fad(80,0)}SILLY, SILLY WASN'T I?
+Dialogue: 0,0:01:07.00,0:01:10.00,Lyric,,0,0,0,,{\fad(80,0)}I REMEMBER, I REMEMBER\NYOUR STARE
+Dialogue: 0,0:01:10.00,0:01:11.50,Lyric,,0,0,0,,{\fad(80,0)}THOSE EYES
+Dialogue: 0,0:01:11.50,0:01:13.00,Lyric,,0,0,0,,{\fad(80,0)}I LOVE IT WHEN YOU LOOK\NAT ME, BABY
+Dialogue: 0,0:01:13.00,0:01:17.50,Lyric,,0,0,0,,{\fad(80,0)}YOUR LIPS, YOUR SMILE
+Dialogue: 0,0:01:17.50,0:01:19.50,Lyric,,0,0,0,,{\fad(80,0)}I LOVE IT WHEN YOU KISS\NME, BABY
+Dialogue: 0,0:01:20.00,0:01:21.50,Lyric,,0,0,0,,{\fad(80,0)}I FELL IN LOVE WITH A\NWOMAN
+Dialogue: 0,0:01:21.50,0:01:23.00,Lyric,,0,0,0,,{\fad(80,0)}HER NAME WAS SALLIE MAE
+Dialogue: 0,0:01:23.00,0:01:24.50,Lyric,,0,0,0,,{\fad(80,0)}SHE PROMISED ME\NFINANCIAL AID
+Dialogue: 0,0:01:24.50,0:01:26.00,Lyric,,0,0,0,,{\fad(80,0)}GRADUATE AND GET PAID
+Dialogue: 0,0:01:26.00,0:01:27.00,Lyric,,0,0,0,,{\fad(80,0)}YEARS LATER I'MA SLAVE
+Dialogue: 0,0:01:27.00,0:01:28.50,Lyric,,0,0,0,,{\fad(80,0)}SO MUCH FOR DEMOCRACY
+Dialogue: 0,0:01:28.50,0:01:30.00,Lyric,,0,0,0,,{\fad(80,0)}FOR MY BROTHAS WITH\NDEGREES
+Dialogue: 0,0:01:30.00,0:01:32.00,Lyric,,0,0,0,,{\fad(80,0)}WHAT DOES THE FLAG DO\NFOR ME?
+Dialogue: 0,0:01:32.00,0:01:33.00,Lyric,,0,0,0,,{\fad(80,0)}MY PEOPLE BUILT THIS\NCOUNTRY
+Dialogue: 0,0:01:33.00,0:01:34.50,Lyric,,0,0,0,,{\fad(80,0)}AND WE DID IT ALL FOR\NFREE
+Dialogue: 0,0:01:34.50,0:01:36.00,Lyric,,0,0,0,,{\fad(80,0)}HOW THE HOMIE SELLING\NWEIGHT
+Dialogue: 0,0:01:36.00,0:01:37.50,Lyric,,0,0,0,,{\fad(80,0)}AND HE MAKING MORE THAN\NME?
+Dialogue: 0,0:01:37.50,0:01:39.00,Lyric,,0,0,0,,{\fad(80,0)}I WAS STRAIGHT IN THEM\NCLASSES
+Dialogue: 0,0:01:39.00,0:01:40.50,Lyric,,0,0,0,,{\fad(80,0)}AND THEM BOOKS AT UNT
+Dialogue: 0,0:01:40.50,0:01:41.50,Lyric,,0,0,0,,{\fad(80,0)}GET IN THE REAL WORLD
+Dialogue: 0,0:01:41.50,0:01:42.50,Lyric,,0,0,0,,{\fad(80,0)}THEY WANT ME TO BREAK
+Dialogue: 0,0:01:42.50,0:01:43.50,Lyric,,0,0,0,,{\fad(80,0)}DO YOU AGREE?
+Dialogue: 0,0:01:43.50,0:01:45.50,Lyric,,0,0,0,,{\fad(80,0)}SO TELL ME MR.\NFLASHLIGHT COP
+Dialogue: 0,0:01:45.50,0:01:46.00,Lyric,,0,0,0,,{\fad(80,0)}WHAT DO YOU SEE?
+Dialogue: 0,0:01:46.00,0:01:47.50,Lyric,,0,0,0,,{\fad(80,0)}A HARD WORKING BLACK\NMALE
+Dialogue: 0,0:01:47.50,0:01:49.00,Lyric,,0,0,0,,{\fad(80,0)}OR A THUG PEDIGREE?
+Dialogue: 0,0:01:49.00,0:01:50.50,Lyric,,0,0,0,,{\fad(80,0)}WHAT IF I'M A LITTLE OF\NBOTH?
+Dialogue: 0,0:01:50.50,0:01:52.00,Lyric,,0,0,0,,{\fad(80,0)}COULD IT BE POSSIBLY
+Dialogue: 0,0:01:52.00,0:01:53.00,Lyric,,0,0,0,,{\fad(80,0)}SALLIE MAE AIN'T FEELING\NME
+Dialogue: 0,0:01:53.00,0:01:55.00,Lyric,,0,0,0,,{\fad(80,0)}SHE STOLE MY CAKE AND\NLIED TO ME
+Dialogue: 0,0:01:55.00,0:01:57.00,Lyric,,0,0,0,,{\fad(80,0)}I BELIEVED IN YOU
+Dialogue: 0,0:01:57.00,0:02:01.50,Lyric,,0,0,0,,{\fad(80,0)}THOUGHT WHAT YOU SAID\NWAS TRUE
+Dialogue: 0,0:02:01.50,0:02:04.00,Lyric,,0,0,0,,{\fad(80,0)}IT DIDN'T OCCUR TO ME
+Dialogue: 0,0:02:04.00,0:02:06.50,Lyric,,0,0,0,,{\fad(80,0)}IT WAS A LIE
+Dialogue: 0,0:02:11.50,0:02:14.50,Lyric,,0,0,0,,{\fad(80,0)}SILLY, SILLY WASN'T I?
